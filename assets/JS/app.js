@@ -1,101 +1,89 @@
 /*get the number of characters*/
-// function charLength() {
+function charLength() {
+  let charLength = document.getElementById("length").value;
+  document.getElementById("result").innerHTML = charLength;
+  return charLength;
+}
+document.getElementById("length").addEventListener("change", charLength);
 
-//         let charLength = document.getElementById('length').value;
-//         document.getElementById('result').innerHTML = charLength;
-//         return charLength;
 
-// }
+// select all the inputs
+const outputBox = document.querySelector("#password__result");
+const copyPass = document.querySelector("#copyIcon");
+const PassLength = document.querySelector("#length");
+const upperCase = document.querySelector("#uppercase");
+const lowerCase = document.querySelector("#lowercase");
+const numbers = document.querySelector("#numbers");
+const symbols = document.querySelector("#symbols");
+const form = document.querySelector("#form");
 
-// document.getElementById('length').addEventListener('change', charLength);
+//  copy password function
 
-const p_result = document.getElementById("password__result");
-const char_length_result = document.getElementById("result");
-const upper_result = document.getElementById("uppercase");
-const lower_result = document.getElementById("lowercase");
-const number_result = document.getElementById("numbers");
-const symbol_result = document.getElementById("symbols");
-const generate_result = document.getElementById("btn");
-
-const allFunctions = {
-  lower: giveRandomLower,
-  upper: giveRandomUpper,
-  number: giveRandomNumber,
-  symbols: giveRandomSymbols,
-};
-
-generate_result.addEventListener("click", function (event) {
-  event.preventDefault();
-
-  const length = +char_length_result.value;
-  const upper = upper_result.checked;
-  const lower = lower_result.checked;
-  const number = number_result.checked;
-  const symbol = symbol_result.checked;
-
-  p_result.innerText = generatePassword(length, upper, lower, number, symbol);
+copyPass.addEventListener("click", async () => {
+  const password = outputBox.value;
+  if (password) {
+    await navigator.clipboard.writeText(password);
+    alert("password copied");
+  } else {
+    alert("There is no password to copy");
+  }
 });
 
-function generatePassword(length, upper, lower, number, symbol) {
-  // remove unchecked types.
-  // loop run for the length.
+// Create a function for random numbers
 
-  let outcomePassword = "";
+function generateRandomChar(min, max) {
+  const limit = max - min + 1;
+  return String.fromCharCode(Math.floor(Math.random() * limit) + min);
+}
 
-  const counts = upper + lower + number + symbol;
-  const countsArray = [{ upper }, { lower }, { number }, { symbol }].filter(
-    (item) => Object.values(item)[0]
-  );
-  if (counts === 0) {
-    return "";
+function uppercase() {
+  return generateRandomChar(65, 90);
+}
+
+function lowercase() {
+  return generateRandomChar(97, 122);
+}
+
+function number() {
+  return generateRandomChar(48, 57);
+}
+
+function symbol() {
+  const allsymbols = "!@#$%^&*()-=_+|/?><.,~`][";
+  return allsymbols[Math.floor(Math.random() * allsymbols.length)];
+}
+
+// create array for all functions
+const functionArray = [
+  {
+    element: upperCase,
+    function: uppercase,
+  },
+  {
+    element: lowerCase,
+    function: lowercase,
+  },
+  {
+    element: numbers,
+    function: number,
+  },
+  {
+    element: symbols,
+    function: symbol,
+  },
+];
+
+// create a function form
+
+form.addEventListener("submit", (event) => {
+  event.preventDefault();
+  const limit = PassLength.value;
+  let generatedPassword = "";
+  const funArray = functionArray.filter(({ element }) => element.checked);
+  for (i = 0; i < limit; i++) {
+    const index = Math.floor(Math.random() * funArray.length);
+    const letter = funArray[index].function();
+    generatedPassword += letter;
   }
-
-  for (let i = 0; i < length; i += counts) {
-    countsArray.forEach((type) => {
-      const nameoffunction = Object.keys;
-      console.log("functionname", nameoffunction);
-      type[0];
-      generatePassword += randomfunc[nameoffunction]();
-    });
-  }
-}
-
-function giveRandomLower() {
-  const lowerCase = "abcdefghijklmnopqrstuvwxyz";
-
-  return lowerCase[Math.floor(Math.random() * lowerCase.length)];
-}
-
-function giveRandomUpper() {
-  const upperCase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-
-  return upperCase[Math.floor(Math.random() * upperCase.length)];
-}
-
-function giveRandomNumber() {
-  const number = "1234567890";
-
-  return number[Math.floor(Math.random() * number.length)];
-}
-
-function giveRandomSymbols() {
-  const symbols = "!@#$%^&*()_-+={}[]|~`><?/";
-
-  return symbols[Math.floor(Math.random() * symbols.length)];
-}
-
-// const generateBtn = document.getElementById("btn");
-// generateBtn.addEventListener("submit",function(event){
-//     event.preventDefault();
-
-//         // let chars = "0123456789abcdefghijklmnopqrstuvwxyz!@#$%^&*()ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//         let chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-//         let passwordLength = charLength;
-//         let password = "";
-//         for (var i = 0; i <= passwordLength; i++) {
-//             let randomNumber = Math.floor(Math.random() * chars.length);
-//             password += chars.substring(randomNumber, randomNumber +1);
-//         }
-//         document.getElementById("password").value = password;
-
-// })
+  outputBox.value = generatedPassword;
+});
